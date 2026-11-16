@@ -374,3 +374,39 @@ Based on the functional dependencies declared by the existing Prisma schema:
 Therefore, the existing Forma database schema is in **Third Normal Form (3NF)**, based on the declared constraints and functional dependencies.
 
 **Note:** If the application enforces an additional business rule that a board's owner must always be the same as its workspace's owner, the relationship between `workspaceId` and `ownerId` may need further analysis. This dependency is not enforced by the current Prisma schema.
+
+## 9. Boyce-Codd Normal Form (BCNF)
+
+Boyce-Codd Normal Form (BCNF) is a stronger version of Third Normal Form (3NF).
+
+A relation is in BCNF if, for every non-trivial functional dependency `X → Y`, X must be a superkey.
+
+In simple terms, every determinant must be a candidate key or a superkey.
+
+### 9.1 Analysis of Forma Tables
+
+Based on the candidate keys and functional dependencies identified in the existing Prisma schema:
+
+| Table | Candidate Key(s) | BCNF Analysis |
+|---|---|---|
+| User | id, email | Both determinants are candidate keys. |
+| Workspace | id | The determinant is a candidate key. |
+| Board | id | The determinant is a candidate key. |
+| BoardCollaborator | id, (boardId, userId) | Both determinants are candidate keys. |
+| BoardInvitation | id, (boardId, email) | Both determinants are candidate keys. |
+
+In each table, the declared non-trivial functional dependencies have candidate keys or superkeys as their determinants.
+
+Therefore, no BCNF violation is identified in the existing relational schema.
+
+### 9.2 Result of BCNF Analysis
+
+Based on the functional dependencies and unique constraints declared in the Prisma schema:
+
+- Every determinant identified is a candidate key or a superkey.
+- No BCNF violation is identified.
+- All five relational models satisfy the requirements of BCNF under the declared functional dependencies.
+
+Thus, the existing Forma database schema appears to be in **Boyce-Codd Normal Form (BCNF)**.
+
+**Note:** This conclusion is based on the dependencies represented by the current Prisma schema. Additional business rules not enforced by the schema may require further analysis. The structured JSON canvas payloads in the Board model are outside this relational BCNF analysis.
