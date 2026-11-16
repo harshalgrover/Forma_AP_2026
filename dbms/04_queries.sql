@@ -212,3 +212,115 @@ SET
     "appState" = $2::jsonb,
     "updatedAt" = CURRENT_TIMESTAMP
 WHERE id = $3;
+
+-- =====================================================
+-- 5. COLLABORATORS
+-- =====================================================
+
+-- READ R11: Get board owner details.
+-- $1 = board ID
+SELECT
+    u.id,
+    u.name,
+    u.email
+FROM "Board" b
+INNER JOIN "User" u ON u.id = b."ownerId"
+WHERE b.id = $1;
+
+
+-- READ R12: Get collaborators of a board.
+-- $1 = board ID
+SELECT
+    bc.id,
+    bc.role,
+    bc."createdAt",
+    u.id AS "userId",
+    u.name,
+    u.email
+FROM "BoardCollaborator" bc
+INNER JOIN "User" u ON u.id = bc."userId"
+WHERE bc."boardId" = $1
+ORDER BY bc."createdAt" ASC;
+
+
+-- READ R13: Get pending invitations of a board.
+-- $1 = board ID
+SELECT *
+FROM "BoardInvitation"
+WHERE "boardId" = $1
+  AND status = 'PENDING'
+ORDER BY "createdAt" ASC;
+
+
+-- READ R14: Find a user by email before inviting them.
+-- $1 = email
+SELECT id, name, email
+FROM "User"
+WHERE email = $1;
+
+
+-- READ R15: Check whether a user is already a collaborator.
+-- $1 = board ID, $2 = user ID
+SELECT *
+FROM "BoardCollaborator"
+WHERE "boardId" = $1
+  AND "userId" = $2;
+
+
+-- WRITE W11: Add a collaborator to a board.
+-- $1 = ID, $2 = board ID, $3 = user ID, $4 = role
+INSERT INTO "BoardCollaborator" (
+    id, "boardId", "userId", role, "createdAt", "updatedAt"
+)
+VALUES (
+    $1, $2, $3, $4, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+);
+
+
+-- WRITE W12: Update a collaborator's role.
+-- $1 = role, $2 = collaborator ID, $3 = board ID
+UPDATE "BoardCollaborator"
+SET
+    role = $1,
+    "updatedAt" = CURRENT_TIMESTAMP
+WHERE id = $2
+  AND "boardId" = $3;
+
+
+-- WRITE W13: Remove a collaborator from a board.
+-- $1 = collaborator ID, $2 = board ID
+DELETE FROM "BoardCollaborator"
+WHERE id = $1
+  AND "boardId" = $2;
+
+
+-- =====================================================
+-- 6. INVITATIONS
+-- =====================================================
+
+-- READ R16: Check for an existing pending invitation.
+-- $1 = board ID, $2 = email
+SELECT *
+FROM "BoardInvitation"
+WHERE "boardId" = $1
+  AND email = $2
+  AND status = 'PENDING';
+
+
+-- WRITE W14: Create a board invitation.
+-- $1 = ID, $2 = board ID, $3 = email, $4 = role
+INSERT INTO "BoardInvitation" (
+    id, "boardId", email, role, status,
+    "createdAt", "updatedAt"
+)
+VALUES (
+    $1, $2, $3, $4, 'PENDING',
+    CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+);
+
+
+-- WRITE W15: Cancel a board invitation.
+-- $1 = invitation ID, $2 = board ID
+DELETE FROM "BoardInvitation"
+WHERE id = $1
+  AND "boardId" = $2;
