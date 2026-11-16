@@ -410,3 +410,24 @@ Based on the functional dependencies and unique constraints declared in the Pris
 Thus, the existing Forma database schema appears to be in **Boyce-Codd Normal Form (BCNF)**.
 
 **Note:** This conclusion is based on the dependencies represented by the current Prisma schema. Additional business rules not enforced by the schema may require further analysis. The structured JSON canvas payloads in the Board model are outside this relational BCNF analysis.
+
+
+## 10. Conclusion
+
+The normalization analysis of the Forma database was performed using the existing Prisma schema and its declared functional dependencies.
+
+The analysis covered the following stages:
+
+- **UNF:** A hypothetical unnormalized structure was examined to understand repeating groups and data anomalies.
+- **1NF:** Repeating groups were separated into individual relational records.
+- **2NF:** No partial dependencies were identified in the existing models.
+- **3NF:** No transitive dependencies among non-key attributes were identified based on the declared functional dependencies.
+- **BCNF:** Every identified determinant is a candidate key or superkey.
+
+The analysis indicates that all five relational models — User, Workspace, Board, BoardCollaborator, and BoardInvitation — satisfy the requirements of 1NF, 2NF, 3NF, and BCNF based on the constraints and dependencies declared in the existing Prisma schema.
+
+The database uses primary keys, unique constraints, and foreign keys to maintain data integrity and organize relationships between entities.
+
+The Board model also stores canvas elements and application state as JSON payloads, which are treated separately from the relational normalization analysis.
+
+Overall, the existing database structure provides an organized foundation for managing users, workspaces, boards, collaborators, and invitations in the Forma application.
