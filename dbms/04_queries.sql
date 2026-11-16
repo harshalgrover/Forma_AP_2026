@@ -114,3 +114,101 @@ WHERE id = $2;
 -- $1 = workspace ID
 DELETE FROM "Workspace"
 WHERE id = $1;
+
+-- =====================================================
+-- 3. BOARDS
+-- =====================================================
+
+-- WRITE W7: Create a board.
+-- $1 = ID, $2 = title, $3 = description,
+-- $4 = workspace ID, $5 = owner ID
+INSERT INTO "Board" (
+    id, title, description, "workspaceId", "ownerId",
+    elements, "appState", "createdAt", "updatedAt"
+)
+VALUES (
+    $1, $2, $3, $4, $5,
+    '[]'::jsonb, '{}'::jsonb,
+    CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+);
+
+
+-- READ R7: Check board access and retrieve collaborator role.
+-- $1 = board ID, $2 = user ID
+SELECT
+    b.*,
+    w.id AS "workspaceId",
+    w.name AS "workspaceName",
+    bc.role AS "collaboratorRole"
+FROM "Board" b
+INNER JOIN "Workspace" w ON w.id = b."workspaceId"
+LEFT JOIN "BoardCollaborator" bc
+    ON bc."boardId" = b.id
+   AND bc."userId" = $2
+WHERE b.id = $1;
+
+
+-- READ R8: Get recently accessed boards.
+-- $1 = user ID, $2 = result limit
+SELECT DISTINCT
+    b.*,
+    w.name AS "workspaceName",
+    bc.role AS "collaboratorRole"
+FROM "Board" b
+INNER JOIN "Workspace" w ON w.id = b."workspaceId"
+LEFT JOIN "BoardCollaborator" bc
+    ON bc."boardId" = b.id
+   AND bc."userId" = $1
+WHERE b."ownerId" = $1
+   OR bc."userId" = $1
+ORDER BY b."updatedAt" DESC
+LIMIT $2;
+
+
+-- READ R9: Get board details by ID.
+-- $1 = board ID
+SELECT
+    b.*,
+    w.name AS "workspaceName"
+FROM "Board" b
+INNER JOIN "Workspace" w ON w.id = b."workspaceId"
+WHERE b.id = $1;
+
+
+-- WRITE W8: Update board details.
+-- $1 = title, $2 = description, $3 = isFavorite,
+-- $4 = board ID
+UPDATE "Board"
+SET
+    title = $1,
+    description = $2,
+    "isFavorite" = $3,
+    "updatedAt" = CURRENT_TIMESTAMP
+WHERE id = $4;
+
+
+-- WRITE W9: Delete a board.
+-- $1 = board ID
+DELETE FROM "Board"
+WHERE id = $1;
+
+
+-- =====================================================
+-- 4. CANVAS
+-- =====================================================
+
+-- READ R10: Retrieve board canvas data.
+-- $1 = board ID
+SELECT elements, "appState"
+FROM "Board"
+WHERE id = $1;
+
+
+-- WRITE W10: Save canvas elements and application state.
+-- $1 = elements JSON, $2 = appState JSON, $3 = board ID
+UPDATE "Board"
+SET
+    elements = $1::jsonb,
+    "appState" = $2::jsonb,
+    "updatedAt" = CURRENT_TIMESTAMP
+WHERE id = $3;
