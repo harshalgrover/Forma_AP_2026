@@ -1,0 +1,6 @@
+"Index Scan using ""Workspace_pkey"" on ""Workspace""  (cost=0.28..8.30 rows=1 width=64) (actual time=0.229..0.231 rows=1 loops=1)"
+"  Index Cond: (id = 'bench_workspace_1'::text)"
+"  Filter: (""ownerId"" = 'bench_user_1'::text)"
+"  Buffers: shared hit=3"
+"Planning Time: 0.222 ms"
+"Execution Time: 0.260 ms"

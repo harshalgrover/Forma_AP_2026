@@ -1,0 +1,6 @@
+"Index Scan using ""BoardInvitation_email_idx"" on ""BoardInvitation""  (cost=0.28..8.30 rows=1 width=82) (actual time=0.278..0.281 rows=1 loops=1)"
+"  Index Cond: (email = 'invitee_2@example.test'::text)"
+"  Filter: (status = 'PENDING'::""InvitationStatus"")"
+"  Buffers: shared hit=3"
+"Planning Time: 0.215 ms"
+"Execution Time: 0.324 ms"

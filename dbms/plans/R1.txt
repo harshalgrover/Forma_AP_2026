@@ -1,0 +1,6 @@
+"Index Scan using ""User_email_key"" on ""User""  (cost=0.28..8.29 rows=1 width=84) (actual time=0.149..0.150 rows=1 loops=1)"
+"  Index Cond: (email = 'user_1@example.test'::text)"
+"  Buffers: shared hit=3"
+"Planning Time: 0.099 ms"
+"Execution Time: 0.168 ms"
+
